@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -24,12 +26,36 @@ func main() {
 		log.Fatal("DB_URL is not in the env")
 	}
 
+	router := chi.NewRouter()
 
-	mux := http.NewServeMux()
+	// set up cors
+	router.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"*"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
-	fmt.Println("Start server on port 4000")
-	err := http.ListenAndServe(":4000", mux)
-	if err != nil {
+	// create another router to mount on router for versioning
+	// this is for future proofing the api
+	v1Router := chi.NewRouter()
+
+	v1Router.Get("/ready", handlerReady)
+
+	// mount the v1Router to router so the whole path will become path/v1/ready
+	router.Mount("/v1", v1Router)
+
+	// creating a server
+	srv := &http.Server{
+		Handler: router,
+		Addr:    ":" + port,
+	}
+
+	// start server
+	fmt.Println("Listening to server on PORT:", port)
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
