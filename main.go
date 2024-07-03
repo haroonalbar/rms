@@ -26,6 +26,7 @@ func main() {
 		log.Fatal("DB_URL is not in the env")
 	}
 
+	// create a router
 	router := chi.NewRouter()
 
 	// set up cors
@@ -39,9 +40,9 @@ func main() {
 	}))
 
 	// create another router to mount on router for versioning
-	// this is for future proofing the api
 	v1Router := chi.NewRouter()
 
+	// handler
 	v1Router.Get("/ready", handlerReady)
 
 	// mount the v1Router to router so the whole path will become path/v1/ready
