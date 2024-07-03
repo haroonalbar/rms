@@ -2,7 +2,7 @@
 
 This is a backend system to manage recruitment using golang.
 
-To create a db in psql 
+To create a db in postgres
 ```
 createdb -U <user_name> <db_name>
 ```
