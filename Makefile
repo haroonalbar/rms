@@ -1,5 +1,5 @@
-buid:
-	@go build . -o ./bin/rms
+build:
+	@go build -o ./bin/rms ./
 
 run: build
 	@./bin/rms
